@@ -1,1 +1,18 @@
-console.log(1 + 1);
+const express = require('express');
+const mongoose = require('mongoose');
+
+const { PORT = 3000 } = process.env;
+
+const app = express();
+
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+});
+
+app.get('/', (req, res) => {
+  res.send('Hello world?');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server listen on ${PORT}`);
+});
