@@ -7,10 +7,6 @@ const {
   updateUserAvatar,
 } = require('../controllers/users');
 
-// router.use((req, res) => {
-//   res.status(404).send({ message: `Запрашиваемый ресурс по адресу '${req.path}' не найден` });
-// });
-
 router.get('/users', getUsers);
 
 router.get('/users/:userId', getUserById);
