@@ -22,7 +22,8 @@
   "homepage": "https://github.com/LethL/express-mesto-gha#readme",
   "devDependencies": {
     "eslint": "^8.20.0",
-    "eslint-config-airbnb-base": "^19.0.4",
+    "eslint-config-airbnb-base":"^15.0.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.26.0",
     "nodemon": "^2.0.19"
   },
