@@ -17,7 +17,13 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(() => res.send({ message: 'Успешно удалено' }))
+    .then((card) => {
+      if (!card) {
+        res.status(404);
+        res.send({ message: 'Запрашиваемая карточка не найдена' });
+      }
+      res.send({ message: 'Успешно удалено' });
+    })
     .catch(next);
 };
 
