@@ -1,12 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const usersRoutes = require('./routes/users');
-const cardsRoutes = require('./routes/cards');
+const router = require('./routes/router');
 
 const { PORT = 3000 } = process.env;
 
 const ERROR_CODE_VALIDATION = 400;
-const ERROR_CODE_CAST = 404;
 const ERROR_CODE_SERVER = 500;
 
 const app = express();
@@ -22,12 +20,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(usersRoutes);
-app.use(cardsRoutes);
+app.use(router);
 
 app.use((err, req, res, next) => {
   if (err.name === 'CastError') {
-    res.status(ERROR_CODE_CAST);
+    res.status(ERROR_CODE_VALIDATION);
     res.send({ message: 'Карточка или пользователь не найден' });
   }
   if (err.name === 'ValidationError') {

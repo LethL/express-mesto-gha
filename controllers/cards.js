@@ -27,7 +27,13 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.send({ message: 'Лайк поставлен' }))
+    .then((card) => {
+      if (!card) {
+        res.status(404);
+        res.send({ message: 'Запрашиваемая карточка не найдена' });
+      }
+      res.send({ message: 'Лайк удален' });
+    })
     .catch(next);
 };
 
@@ -37,7 +43,13 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.send({ message: 'Лайк удален' }))
+    .then((card) => {
+      if (!card) {
+        res.status(404);
+        res.send({ message: 'Запрашиваемая карточка не найдена' });
+      }
+      res.send({ message: 'Лайк удален' });
+    })
     .catch(next);
 };
 
