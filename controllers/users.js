@@ -9,10 +9,16 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_CODE_CAST).send({ message: 'Пользователь по указанному id не найден.' });
+      } else {
+        res.send(user);
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_CAST).send({ message: 'Пользователь по указанному id не найден.' });
+        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при поискеs пользователя.' });
       } else {
         res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
       }

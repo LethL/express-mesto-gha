@@ -25,10 +25,16 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(() => res.send({ message: 'Успешно удалено' }))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE_CAST).send({ message: 'Карточка с указанным id не найдена.' });
+      } else {
+        res.send({ message: 'Успешно удалено' });
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_CAST).send({ message: 'Карточка с указанным id не найдена.' });
+        res.status(ERROR_CODE_VALIDATION).send({ message: 'Передан некорректный id карточки.' });
       } else {
         res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
       }
@@ -41,12 +47,16 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.send({ message: 'Лайк поставлен' }))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE_CAST).send({ message: 'Карточка с указанным id не найдена.' });
+      } else {
+        res.send({ message: 'Лайк поставлен' });
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_CAST).send({ message: 'Передан несуществующий id карточки.' });
-      } else if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные для постановки лайка.' });
+        res.status(ERROR_CODE_VALIDATION).send({ message: 'Передан некорректный id карточки.' });
       } else {
         res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
       }
@@ -59,12 +69,16 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.send({ message: 'Лайк удален' }))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE_CAST).send({ message: 'Карточка с указанным id не найдена.' });
+      } else {
+        res.send({ message: 'Лайк удален' });
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_CAST).send({ message: 'Передан несуществующий id карточки.' });
-      } else if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные для удаления лайка.' });
+        res.status(ERROR_CODE_VALIDATION).send({ message: 'Передан некорректный id карточки.' });
       } else {
         res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
       }
