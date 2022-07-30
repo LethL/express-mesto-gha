@@ -2,7 +2,7 @@ const router = require('express').Router();
 const usersRoutes = require('./users');
 const cardsRoutes = require('./cards');
 
-const ERROR_CODE_CAST = 404;
+const { ERROR_CODE_CAST } = require('../errors/errors');
 
 router.use(usersRoutes);
 router.use(cardsRoutes);
