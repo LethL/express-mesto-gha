@@ -22,7 +22,7 @@ const getUserById = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при поискеs пользователя.' });
+        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при поиске пользователя.' });
       } else {
         res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
       }
@@ -102,6 +102,12 @@ const login = (req, res) => {
     .catch(() => res.status(ERROR_CODE_AUTH).send({ message: 'Неправильные почта или пароль.' }));
 };
 
+const getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => res.send(user))
+    .catch((err) => res.send(err));
+};
+
 module.exports = {
   getUsers,
   getUserById,
@@ -109,4 +115,5 @@ module.exports = {
   updateUserInfo,
   updateUserAvatar,
   login,
+  getCurrentUser,
 };
