@@ -24,11 +24,14 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         res.status(ERROR_CODE_CAST).send({ message: 'Карточка с указанным id не найдена.' });
+      } else if (card.owner._id.toString() !== req.user._id.toString()) {
+        res.status(ERROR_CODE_CAST).send({ message: 'Недостаточно прав для удаления.' });
       } else {
+        card.remove();
         res.send({ message: 'Успешно удалено' });
       }
     })
