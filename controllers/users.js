@@ -38,10 +38,14 @@ const createUser = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.send(user.toJSON()))
+    .then((user) => res.send({
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else if (err.code === 11000) {
+        res.status(409).send({ message: 'Пользователь с таким email уже существует.' });
       } else {
         res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
       }
