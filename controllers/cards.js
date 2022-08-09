@@ -1,6 +1,8 @@
 const Card = require('../models/card');
 
-const { ERROR_CODE_VALIDATION, ERROR_CODE_CAST, ERROR_CODE_SERVER } = require('../errors/errors');
+const {
+  ERROR_CODE_VALIDATION, ERROR_CODE_CAST, ERROR_CODE_SERVER, ERROR_CODE_RIGHTS,
+} = require('../errors/errors');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -29,7 +31,7 @@ const deleteCard = (req, res) => {
       if (!card) {
         res.status(ERROR_CODE_CAST).send({ message: 'Карточка с указанным id не найдена.' });
       } else if (card.owner._id.toString() !== req.user._id.toString()) {
-        res.status(ERROR_CODE_CAST).send({ message: 'Недостаточно прав для удаления.' });
+        res.status(ERROR_CODE_RIGHTS).send({ message: 'Недостаточно прав для удаления.' });
       } else {
         card.remove();
         res.send({ message: 'Успешно удалено' });
