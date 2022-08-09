@@ -1,13 +1,13 @@
 const { celebrate, Joi } = require('celebrate');
 
 // eslint-disable-next-line no-useless-escape
-const avatarLinkRegExp = /(http:\/\/|https:\/\/)(www)*[a-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]+#*/;
+const linkRegExp = /(http:\/\/|https:\/\/)(www)*[a-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]+#*/;
 
 const userValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(20),
-    avatar: Joi.string().pattern(avatarLinkRegExp),
+    avatar: Joi.string().pattern(linkRegExp),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -22,8 +22,35 @@ const loginValidation = celebrate({
 
 const avatarValidation = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(avatarLinkRegExp),
+    avatar: Joi.string().required().pattern(linkRegExp),
   }),
 });
 
-module.exports = { userValidation, loginValidation, avatarValidation };
+const idValidation = celebrate({
+  params: Joi.object().keys({
+    _id: Joi.string().alphanum().length(24).hex(),
+  }),
+});
+
+const userInfoValidation = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+  }),
+});
+
+const cardValidation = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(linkRegExp),
+  }),
+});
+
+module.exports = {
+  userValidation,
+  loginValidation,
+  avatarValidation,
+  idValidation,
+  userInfoValidation,
+  cardValidation,
+};

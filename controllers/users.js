@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {
-  ERROR_CODE_VALIDATION, ERROR_CODE_CAST, ERROR_CODE_SERVER, ERROR_CODE_AUTH,
+  ERROR_CODE_VALIDATION, ERROR_CODE_CAST, ERROR_CODE_SERVER, ERROR_CODE_AUTH, ERROR_CODE_DUPLICATE,
 } = require('../errors/errors');
 
 const getUsers = (req, res) => {
@@ -45,7 +45,7 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else if (err.code === 11000) {
-        res.status(409).send({ message: 'Пользователь с таким email уже существует.' });
+        res.status(ERROR_CODE_DUPLICATE).send({ message: 'Пользователь с таким email уже существует.' });
       } else {
         res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
       }
