@@ -2,13 +2,13 @@ const router = require('express').Router();
 const usersRoutes = require('./users');
 const cardsRoutes = require('./cards');
 
-const { ERROR_CODE_CAST } = require('../errors/errors');
+const NotFoundError = require('../errors/NotFoundError');
 
 router.use(usersRoutes);
 router.use(cardsRoutes);
 
-router.use((req, res) => {
-  res.status(ERROR_CODE_CAST).send({ message: 'Здесь ничего нет' });
+router.use((req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
 
 module.exports = router;

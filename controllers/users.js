@@ -1,35 +1,36 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  ERROR_CODE_VALIDATION, ERROR_CODE_CAST, ERROR_CODE_SERVER, ERROR_CODE_AUTH, ERROR_CODE_DUPLICATE,
-} = require('../errors/errors');
 
-const getUsers = (req, res) => {
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
+const DuplicateError = require('../errors/ValidationError');
+
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' }));
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_CODE_CAST).send({ message: 'Пользователь по указанному id не найден.' });
+        throw new NotFoundError('Пользователь по указанному id не найден.');
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при поиске пользователя.' });
+        next(new ValidationError('Переданы некорректные данные при поиске пользователя.'));
       } else {
-        res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
+        next(err);
       }
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -43,16 +44,16 @@ const createUser = (req, res) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        next(new ValidationError('Переданы некорректные данные при создании пользователя.'));
       } else if (err.code === 11000) {
-        res.status(ERROR_CODE_DUPLICATE).send({ message: 'Пользователь с таким email уже существует.' });
+        next(new DuplicateError(('Пользователь с таким email уже существует.')));
       } else {
-        res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
+        next(err);
       }
     });
 };
 
-const updateUserInfo = (req, res) => {
+const updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
@@ -60,16 +61,16 @@ const updateUserInfo = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_CAST).send({ message: 'Пользователь по указанному id не найден.' });
+        throw new NotFoundError('Пользователь по указанному id не найден.');
       } else if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при обновлении пользователя.' });
+        next(new ValidationError('Переданы некорректные данные при обновлении пользователя.'));
       } else {
-        res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
+        next(err);
       }
     });
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   const avatar = req.body;
   const userId = req.user._id;
 
@@ -77,16 +78,16 @@ const updateUserAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_CAST).send({ message: 'Пользователь по указанному id не найден.' });
+        throw new NotFoundError('Пользователь по указанному id не найден.');
       } else if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_VALIDATION).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+        next(new ValidationError('Переданы некорректные данные при обновлении аватара.'));
       } else {
-        res.status(ERROR_CODE_SERVER).send({ message: 'Ошибка по-умолчанию.' });
+        next(err);
       }
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -103,13 +104,13 @@ const login = (req, res) => {
       })
         .send({ token });
     })
-    .catch(() => res.status(ERROR_CODE_AUTH).send({ message: 'Неправильные почта или пароль.' }));
+    .catch(next);
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => res.send(user))
-    .catch((err) => res.send(err));
+    .catch(next);
 };
 
 module.exports = {

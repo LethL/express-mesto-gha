@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { linkRegExp } = require('../middlewares/validation');
 
 const CardSchema = new mongoose.Schema({
   name: {
@@ -10,6 +11,12 @@ const CardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator(link) {
+        return linkRegExp.test(link);
+      },
+      message: 'Переданы некорректные данные при создании карточки.',
+    },
   },
   owner: {
     type: mongoose.ObjectId,
