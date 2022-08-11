@@ -48,7 +48,7 @@ const createUser = (req, res, next) => {
       } else if (err.name === 'MongoError' || err.code === 11000) {
         next(new DuplicateError(('Пользователь с таким email уже существует.')));
       } else {
-        next(new DuplicateError(('Пользователь с таким email уже существует.')));
+        next(err);
       }
     });
 };
